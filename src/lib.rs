@@ -1,10 +1,27 @@
 use std::{
+    ffi::OsStr,
     path::{Path, PathBuf},
     process::Command,
 };
 
+const FLATC_VERSION_PREFIX: &str = "flatc version ";
+const SUPPORTED_FLATC_VERSION: &str = "23.5.26";
+
 #[derive(thiserror::Error, Debug)]
-pub enum Error {}
+pub enum Error {
+    #[error("flatc exited unexpectedly with status code {status_code:?}\n-- stdout:\n{stdout}\n-- stderr:\n{stderr}\n")]
+    FlatcErrorCode {
+        status_code: Option<i32>,
+        stdout: String,
+        stderr: String,
+    },
+    #[error("flatc returned invalid output for --version: {0}")]
+    InvalidFlatcOutput(String),
+    #[error("flatc version '{0}' is unsupported by this version of the library. Please match your library with your flatc version")]
+    UnsupportedFlatcVersion(String),
+}
+
+pub type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BuilderOptions {
@@ -36,12 +53,12 @@ impl BuilderOptions {
         }
     }
 
-    pub fn compile(self) {
+    pub fn compile(self) -> Result {
         compile(self)
     }
 }
 
-fn compile(builder_options: BuilderOptions) {
+fn compile(builder_options: BuilderOptions) -> Result {
     let files_str: Vec<_> = builder_options
         .files
         .iter()
@@ -56,10 +73,51 @@ fn compile(builder_options: BuilderOptions) {
         .unwrap_or_else(|| std::env::var("OUT_DIR"))
         .unwrap();
 
+    confirm_flatc_version(&compiler)?;
+
     let mut args = vec!["--rust", "-o", &output_path];
     args.extend(files_str.iter().map(|s| &s[..]));
+    run_flatc(&compiler, &args)?;
+    Ok(())
+}
 
-    let mut child = Command::new(compiler).args(&args).spawn().unwrap();
+fn confirm_flatc_version(compiler: &str) -> Result {
+    // Output shows up in stdout
+    let output = run_flatc(compiler, ["--version"])?;
+    if !output.stdout.starts_with(FLATC_VERSION_PREFIX) {
+        Err(Error::InvalidFlatcOutput(output.stdout))
+    } else {
+        let version_str = output.stdout[FLATC_VERSION_PREFIX.len()..].trim_end();
+        if version_str != SUPPORTED_FLATC_VERSION {
+            Err(Error::UnsupportedFlatcVersion(version_str.into()))
+        } else {
+            Ok(())
+        }
+    }
+}
 
-    child.wait().unwrap();
+struct ProgramOutput {
+    pub stdout: String,
+    pub _stderr: String,
+}
+
+fn run_flatc<I: IntoIterator<Item = S>, S: AsRef<OsStr>>(
+    compiler: &str,
+    args: I,
+) -> Result<ProgramOutput> {
+    let output = Command::new(compiler).args(args).output().unwrap();
+    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+    let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
+    if !output.status.success() {
+        Err(Error::FlatcErrorCode {
+            status_code: output.status.code(),
+            stdout,
+            stderr,
+        })
+    } else {
+        Ok(ProgramOutput {
+            stdout,
+            _stderr: stderr,
+        })
+    }
 }
