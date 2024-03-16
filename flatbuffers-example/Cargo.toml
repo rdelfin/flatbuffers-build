@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-flatbuffers = "23.5"
+flatbuffers = "=23.5.26"
 
 [build-dependencies]
 flatbuffers-gen = { path = ".." }
