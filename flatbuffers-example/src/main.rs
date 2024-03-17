@@ -3,6 +3,24 @@ pub mod defs {
     include!(concat!(env!("OUT_DIR"), "/example_generated.rs"));
 }
 
-fn main() {
-    println!("Hello, world!");
+use defs::my_game::sample::{Monster, MonsterArgs, Vec3};
+
+fn main() -> anyhow::Result<()> {
+    // Writing a monster object to encoded bytes
+    let mut builder = flatbuffers::FlatBufferBuilder::with_capacity(1024);
+    let m = Monster::create(
+        &mut builder,
+        &MonsterArgs {
+            pos: Some(&Vec3::new(0.1, 0.2, 0.3)),
+            ..Default::default()
+        },
+    );
+    builder.finish(m, None);
+    let encoded_data = builder.finished_data();
+
+    // Reading the object back
+    let monster = flatbuffers::root::<Monster>(encoded_data)?;
+    println!("Read back monster: {monster:?}");
+
+    Ok(())
 }
