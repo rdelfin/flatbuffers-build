@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic)]
+
 fn main() {
     #[cfg(feature = "vendored")]
     vendored::vendor_flatc().expect("failed to vendor flatc");
@@ -84,8 +86,7 @@ mod vendored {
     }
 
     fn compile_flatc<P: AsRef<Path>>(source_dir: P) -> PathBuf {
-        let dst = cmake::build(source_dir);
-        dst
+        cmake::build(source_dir)
     }
 
     fn get_full_source_url() -> String {
