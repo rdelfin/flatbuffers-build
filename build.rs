@@ -6,8 +6,10 @@ fn main() {
 #[cfg(feature = "vendored")]
 mod vendored {
     use flate2::read::GzDecoder;
+    use ring::digest::{Context, SHA256};
     use std::{
         fs::File,
+        io::{BufReader, Read},
         path::{Path, PathBuf},
     };
     use tar::Archive;
@@ -23,9 +25,12 @@ mod vendored {
         let tmpdir = tempfile::tempdir()?;
 
         let tarball_path = download_source_tarball(&tmpdir)?;
+        checksum_check(&tarball_path, CHECKSUM_SHA256)?;
+
         // Extract the source tarball
         let extract_path = tmpdir.path().join("flatbuffers");
         unpack_tarball(tarball_path, &extract_path)?;
+
         let source_dir = extract_path
             .join(EXTRACT_DIRECTORY_PREFIX.replace("{version}", SUPPORTED_FLATC_VERSION));
         let dest = compile_flatc(source_dir);
@@ -51,6 +56,31 @@ mod vendored {
         let mut archive = Archive::new(tar);
         archive.unpack(extraction_path)?;
         Ok(())
+    }
+
+    fn checksum_check<P: AsRef<Path>>(file_path: P, expected_checksum: &str) -> anyhow::Result<()> {
+        let mut digester = Context::new(&SHA256);
+        let mut file = File::open(file_path)?;
+        let mut reader = BufReader::new(&mut file);
+        let mut buffer = [0u8; 4096];
+        loop {
+            let byte_count = reader.read(&mut buffer)?;
+            if byte_count == 0 {
+                break;
+            }
+            digester.update(&buffer[..byte_count]);
+        }
+        let digest = digester.finish();
+        let digest_str = hex::encode(digest.as_ref());
+        if digest_str == expected_checksum {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!(
+                "checskum for file did not match; expected {}, got {}",
+                expected_checksum,
+                digest_str
+            ))
+        }
     }
 
     fn compile_flatc<P: AsRef<Path>>(source_dir: P) -> PathBuf {
