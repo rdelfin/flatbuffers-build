@@ -33,7 +33,7 @@
 //!
 //! You can then have a very simple `build.rs` as follows:
 //! ```no_run
-//! use flatbuffers_gen::BuilderOptions;
+//! use flatbuffers_build::BuilderOptions;
 //!
 //! BuilderOptions::new_with_files(["example.fbs"])
 //!     .compile()
@@ -113,7 +113,7 @@ pub type Result<T = (), E = Error> = std::result::Result<T, E>;
 /// [`BuilderOptions::compile`], this generates rust code from the flatbuffer definition files
 /// provided. The basic usage for this struct looks something like this:
 /// ```no_run
-/// use flatbuffers_gen::BuilderOptions;
+/// use flatbuffers_build::BuilderOptions;
 ///
 /// BuilderOptions::new_with_files(["some_file.fbs", "some_other_file.fbs"])
 ///     .compile()
@@ -122,7 +122,7 @@ pub type Result<T = (), E = Error> = std::result::Result<T, E>;
 ///
 /// This struct operates as a builder pattern, so you can do things like set the `flatc` path:
 /// ```no_run
-/// # use flatbuffers_gen::BuilderOptions;
+/// # use flatbuffers_build::BuilderOptions;
 /// BuilderOptions::new_with_files(["some_file.fbs", "some_other_file.fbs"])
 ///     .set_compiler("/some/path/to/flatc")
 ///     .compile()
