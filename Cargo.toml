@@ -3,6 +3,10 @@ name = "flatbuffers-gen"
 version = "0.1.0+flatc-23.5.26"
 edition = "2021"
 license = "MIT"
+categories = ["encoding"]
+description = "A library that facilitates generating flatbuffer code from Rust"
+authors = ["Ricardo Delfin"]
+readme = "README.md"
 
 [dependencies]
 thiserror = "1"
