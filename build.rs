@@ -28,6 +28,10 @@ fn vendor_flatc() -> anyhow::Result<()> {
     // Extract the source tarball
     let extract_path = tmpdir.path().join("flatbuffers");
     unpack_tarball(tarball_path, &extract_path)?;
+    let source_dir =
+        extract_path.join(EXTRACT_DIRECTORY_PREFIX.replace("{version}", SUPPORTED_FLATC_VERSION));
+    let dest = compile_flatc(source_dir);
+    let flatc_path = dest.join("flatc");
     Ok(())
 }
 
@@ -48,6 +52,11 @@ fn unpack_tarball<P: AsRef<Path>, Q: AsRef<Path>>(
     let mut archive = Archive::new(tar);
     archive.unpack(extraction_path)?;
     Ok(())
+}
+
+fn compile_flatc<P: AsRef<Path>>(source_dir: P) -> PathBuf {
+    let dst = cmake::build(source_dir);
+    dst
 }
 
 fn get_full_source_url() -> String {
