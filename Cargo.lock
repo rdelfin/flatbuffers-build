@@ -218,7 +218,6 @@ dependencies = [
  "anyhow",
  "flatbuffers",
  "flatbuffers-gen",
- "flate2",
 ]
 
 [[package]]
@@ -227,6 +226,7 @@ version = "0.1.0+flatc-23.5.26"
 dependencies = [
  "anyhow",
  "cmake",
+ "flate2",
  "hex",
  "reqwest",
  "sha2",
