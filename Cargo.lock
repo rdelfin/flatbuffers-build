@@ -174,16 +174,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "flatbuffers-example"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "flatbuffers",
- "flatbuffers-gen",
-]
-
-[[package]]
-name = "flatbuffers-gen"
+name = "flatbuffers-build"
 version = "0.1.0+flatc-23.5.26"
 dependencies = [
  "anyhow",
@@ -195,6 +186,15 @@ dependencies = [
  "tar",
  "tempfile",
  "thiserror",
+]
+
+[[package]]
+name = "flatbuffers-example"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "flatbuffers",
+ "flatbuffers-build",
 ]
 
 [[package]]

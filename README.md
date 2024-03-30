@@ -1,4 +1,4 @@
-# flatbuffers-gen
+# flatbuffers-build
 
 This crate provides a set of functions to facilitate compiling flatbuffers to Rust from within
 Rust. This is particularly helpful for use in `build.rs` scripts. Please note that for
@@ -9,7 +9,7 @@ to flatbuffers' versioning policy, it could be ok to mix patch and even minor ve
 ## Usage
 
 If you're not sure where to start, look at the
-[`flatbuffers-example`](https://github.com/rdelfin/flatbuffers-gen/tree/main/flatbuffers-example)
+[`flatbuffers-example`](https://github.com/rdelfin/flatbuffers-build/tree/main/flatbuffers-example)
 folder in the repo for an example. However, we'll explain the full functionality here.
 
 As an example, imagine a crate with the following folder structure:
@@ -21,7 +21,7 @@ As an example, imagine a crate with the following folder structure:
     └── lib.rs
 ```
 In order to compile and use the code generated from `example.fbs` code, first you need to add
-`flatbuffers-gen` to your build dependencies, as well as a matching version of `flatbuffers`:
+`flatbuffers-build` to your build dependencies, as well as a matching version of `flatbuffers`:
 ```toml
 # Cargo.toml
 # [...]
@@ -29,7 +29,7 @@ In order to compile and use the code generated from `example.fbs` code, first yo
 flatbuffers = "=23.5.26"
 
 [build-dependencies]
-flatbuffers-gen = "=0.1.0"
+flatbuffers-build = "=0.1.0"
 # [...]
 ```
 

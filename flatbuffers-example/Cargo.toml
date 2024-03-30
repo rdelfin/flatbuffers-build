@@ -8,4 +8,4 @@ anyhow = "1"
 flatbuffers = "=23.5.26"
 
 [build-dependencies]
-flatbuffers-gen = { path = "..", features = ["vendored"] }
+flatbuffers-build = { path = "..", features = ["vendored"] }

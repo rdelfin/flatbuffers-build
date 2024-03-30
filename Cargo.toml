@@ -1,5 +1,5 @@
 [package]
-name = "flatbuffers-gen"
+name = "flatbuffers-build"
 version = "0.1.0+flatc-23.5.26"
 edition = "2021"
 license = "MIT"
