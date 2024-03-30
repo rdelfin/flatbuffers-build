@@ -1,65 +1,64 @@
-use flate2::read::GzDecoder;
-use sha2::{Digest, Sha256};
-use std::{
-    fs::File,
-    io::{Read, Write},
-    path::{Path, PathBuf},
-    sync::mpsc,
-    thread::JoinHandle,
-};
-use tar::Archive;
-use tempfile::TempDir;
-
-const SOURCE_URL: &str =
-    "https://github.com/google/flatbuffers/archive/refs/tags/v{version}.tar.gz";
-const SUPPORTED_FLATC_VERSION: &str = "23.5.26";
-const CHECKSUM_SHA256: &str = "1cce06b17cddd896b6d73cc047e36a254fb8df4d7ea18a46acf16c4c0cd3f3f3";
-const EXTRACT_DIRECTORY_PREFIX: &str = "flatbuffers-{version}";
-
 fn main() {
     #[cfg(feature = "vendored")]
-    vendor_flatc().expect("failed to vendor flatc");
+    vendored::vendor_flatc().expect("failed to vendor flatc");
 }
 
-fn vendor_flatc() -> anyhow::Result<()> {
-    let tmpdir = tempfile::tempdir()?;
+#[cfg(feature = "vendored")]
+mod vendored {
+    use flate2::read::GzDecoder;
+    use std::{
+        fs::File,
+        path::{Path, PathBuf},
+    };
+    use tar::Archive;
 
-    let tarball_path = download_source_tarball(&tmpdir)?;
-    // Extract the source tarball
-    let extract_path = tmpdir.path().join("flatbuffers");
-    unpack_tarball(tarball_path, &extract_path)?;
-    let source_dir =
-        extract_path.join(EXTRACT_DIRECTORY_PREFIX.replace("{version}", SUPPORTED_FLATC_VERSION));
-    let dest = compile_flatc(source_dir);
-    let flatc_path = dest.join("bin/flatc");
-    println!("cargo::rustc-env=FLATC_PATH={}", flatc_path.display());
-    Ok(())
-}
+    const SOURCE_URL: &str =
+        "https://github.com/google/flatbuffers/archive/refs/tags/v{version}.tar.gz";
+    const SUPPORTED_FLATC_VERSION: &str = "23.5.26";
+    const CHECKSUM_SHA256: &str =
+        "1cce06b17cddd896b6d73cc047e36a254fb8df4d7ea18a46acf16c4c0cd3f3f3";
+    const EXTRACT_DIRECTORY_PREFIX: &str = "flatbuffers-{version}";
 
-fn download_source_tarball<P: AsRef<Path>>(dir: P) -> anyhow::Result<PathBuf> {
-    let tarball_path = dir.as_ref().join("flatbuffers.tar.gz");
-    let mut file = File::create(&tarball_path)?;
-    let mut response = reqwest::blocking::get(get_full_source_url())?;
-    response.copy_to(&mut file)?;
-    Ok(tarball_path)
-}
+    pub fn vendor_flatc() -> anyhow::Result<()> {
+        let tmpdir = tempfile::tempdir()?;
 
-fn unpack_tarball<P: AsRef<Path>, Q: AsRef<Path>>(
-    tarball_path: P,
-    extraction_path: Q,
-) -> anyhow::Result<()> {
-    let tar_gz = File::open(tarball_path)?;
-    let tar = GzDecoder::new(tar_gz);
-    let mut archive = Archive::new(tar);
-    archive.unpack(extraction_path)?;
-    Ok(())
-}
+        let tarball_path = download_source_tarball(&tmpdir)?;
+        // Extract the source tarball
+        let extract_path = tmpdir.path().join("flatbuffers");
+        unpack_tarball(tarball_path, &extract_path)?;
+        let source_dir = extract_path
+            .join(EXTRACT_DIRECTORY_PREFIX.replace("{version}", SUPPORTED_FLATC_VERSION));
+        let dest = compile_flatc(source_dir);
+        let flatc_path = dest.join("bin/flatc");
+        println!("cargo::rustc-env=FLATC_PATH={}", flatc_path.display());
+        Ok(())
+    }
 
-fn compile_flatc<P: AsRef<Path>>(source_dir: P) -> PathBuf {
-    let dst = cmake::build(source_dir);
-    dst
-}
+    fn download_source_tarball<P: AsRef<Path>>(dir: P) -> anyhow::Result<PathBuf> {
+        let tarball_path = dir.as_ref().join("flatbuffers.tar.gz");
+        let mut file = File::create(&tarball_path)?;
+        let mut response = reqwest::blocking::get(get_full_source_url())?;
+        response.copy_to(&mut file)?;
+        Ok(tarball_path)
+    }
 
-fn get_full_source_url() -> String {
-    SOURCE_URL.replace("{version}", SUPPORTED_FLATC_VERSION)
+    fn unpack_tarball<P: AsRef<Path>, Q: AsRef<Path>>(
+        tarball_path: P,
+        extraction_path: Q,
+    ) -> anyhow::Result<()> {
+        let tar_gz = File::open(tarball_path)?;
+        let tar = GzDecoder::new(tar_gz);
+        let mut archive = Archive::new(tar);
+        archive.unpack(extraction_path)?;
+        Ok(())
+    }
+
+    fn compile_flatc<P: AsRef<Path>>(source_dir: P) -> PathBuf {
+        let dst = cmake::build(source_dir);
+        dst
+    }
+
+    fn get_full_source_url() -> String {
+        SOURCE_URL.replace("{version}", SUPPORTED_FLATC_VERSION)
+    }
 }
