@@ -7,7 +7,7 @@
 //! to flatbuffers' versioning policy, it could be ok to mix patch and even minor versions.
 //!
 //! If you're not sure where to start, take a look at [`BuilderOptions`]. Please also look at the
-//! [`flatbuffers-example`](https://github.com/rdelfin/flatbuffers-gen/tree/main/flatbuffers-example)
+//! [`flatbuffers-example`](https://github.com/rdelfin/flatbuffers-build/tree/main/flatbuffers-example)
 //! folder in the repo for an example. However, we'll explain the full functionality here.
 //!
 //! As an example, imagine a crate with the following folder structure:
@@ -19,7 +19,7 @@
 //!     └── lib.rs
 //! ```
 //! In order to compile and use the code generated from `example.fbs` code, first you need to add
-//! `flatbuffers-gen` to your build dependencies, as well as a matching version of `flatbuffers`:
+//! `flatbuffers-build` to your build dependencies, as well as a matching version of `flatbuffers`:
 //! ```toml
 //! # Cargo.toml
 //! # [...]
@@ -27,7 +27,7 @@
 //! flatbuffers = "=23.5.26"
 //!
 //! [build-dependencies]
-//! flatbuffers-gen = "=23.5.26"
+//! flatbuffers-build = "=23.5.26"
 //! # [...]
 //! ```
 //!
