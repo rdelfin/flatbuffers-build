@@ -6,7 +6,19 @@ edition = "2021"
 [dependencies]
 thiserror = "1"
 
+[features]
+vendored = []
+
 [workspace]
 members = [
     "flatbuffers-example",
 ]
+
+[build-dependencies]
+tempfile = "3"
+cmake = "0.1"
+anyhow = "1"
+reqwest = { version = "0.12", features = ["blocking"] }
+sha2 = "0.10"
+hex = "0.4"
+tar = "0.4"
