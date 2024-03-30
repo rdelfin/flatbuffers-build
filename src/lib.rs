@@ -67,6 +67,7 @@ use std::{
 };
 
 const FLATC_VERSION_PREFIX: &str = "flatc version ";
+const FLATC_BUILD_PATH: Option<&str> = option_env!("FLATC_PATH");
 
 /// Version of `flatc` supported by this library. Make sure this matches exactly with the `flatc`
 /// binary you're using and the version of the `flatbuffers` rust library.
@@ -201,9 +202,13 @@ fn compile(builder_options: BuilderOptions) -> Result {
         .iter()
         .map(|p| p.clone().into_os_string())
         .collect();
-    let compiler = builder_options
-        .compiler
-        .unwrap_or_else(|| std::env::var("FLATC_PATH").unwrap_or("flatc".into()));
+    let compiler = builder_options.compiler.unwrap_or_else(|| {
+        if let Some(build_flatc) = FLATC_BUILD_PATH {
+            build_flatc.to_owned()
+        } else {
+            std::env::var("FLATC_PATH").unwrap_or("flatc".into())
+        }
+    });
     let output_path = builder_options.output_path.map_or_else(
         || std::env::var_os("OUT_DIR").ok_or(Error::OutputDirNotSet),
         |p| Ok(p.into_os_string()),

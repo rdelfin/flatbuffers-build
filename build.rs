@@ -31,7 +31,8 @@ fn vendor_flatc() -> anyhow::Result<()> {
     let source_dir =
         extract_path.join(EXTRACT_DIRECTORY_PREFIX.replace("{version}", SUPPORTED_FLATC_VERSION));
     let dest = compile_flatc(source_dir);
-    let flatc_path = dest.join("flatc");
+    let flatc_path = dest.join("bin/flatc");
+    println!("cargo::rustc-env=FLATC_PATH={}", flatc_path.display());
     Ok(())
 }
 
