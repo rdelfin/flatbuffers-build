@@ -9,4 +9,3 @@ flatbuffers = "=23.5.26"
 
 [build-dependencies]
 flatbuffers-gen = { path = ".." }
-flate2 = "1.0.28"

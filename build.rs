@@ -1,3 +1,4 @@
+use flate2::read::GzDecoder;
 use sha2::{Digest, Sha256};
 use std::{
     fs::File,
@@ -13,6 +14,7 @@ const SOURCE_URL: &str =
     "https://github.com/google/flatbuffers/archive/refs/tags/v{version}.tar.gz";
 const SUPPORTED_FLATC_VERSION: &str = "23.5.26";
 const CHECKSUM_SHA256: &str = "1cce06b17cddd896b6d73cc047e36a254fb8df4d7ea18a46acf16c4c0cd3f3f3";
+const EXTRACT_DIRECTORY_PREFIX: &str = "flatbuffers-{version}";
 
 fn main() {
     #[cfg(feature = "vendored")]
@@ -25,10 +27,7 @@ fn vendor_flatc() -> anyhow::Result<()> {
     let tarball_path = download_source_tarball(&tmpdir)?;
     // Extract the source tarball
     let extract_path = tmpdir.path().join("flatbuffers");
-    // let mut ar = Archive::new(File::open(tarball_path)?);
-    // ar.unpack(&extract_path)?;
-    println!("AAAA we extracted to {}", extract_path.display());
-    std::process::exit(1);
+    unpack_tarball(tarball_path, &extract_path)?;
     Ok(())
 }
 
@@ -38,6 +37,17 @@ fn download_source_tarball<P: AsRef<Path>>(dir: P) -> anyhow::Result<PathBuf> {
     let mut response = reqwest::blocking::get(get_full_source_url())?;
     response.copy_to(&mut file)?;
     Ok(tarball_path)
+}
+
+fn unpack_tarball<P: AsRef<Path>, Q: AsRef<Path>>(
+    tarball_path: P,
+    extraction_path: Q,
+) -> anyhow::Result<()> {
+    let tar_gz = File::open(tarball_path)?;
+    let tar = GzDecoder::new(tar_gz);
+    let mut archive = Archive::new(tar);
+    archive.unpack(extraction_path)?;
+    Ok(())
 }
 
 fn get_full_source_url() -> String {
