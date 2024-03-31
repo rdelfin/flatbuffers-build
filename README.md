@@ -38,6 +38,7 @@ You can then have a very simple `build.rs` as follows:
 use flatbuffers_gen::BuilderOptions;
 
 BuilderOptions::new_with_files(["example.fbs"])
+    .set_symlink_directory("src/gen_flatbuffers")
     .compile()
     .expect("flatbuffer compilation failed");
 ```
@@ -51,13 +52,24 @@ This will just compile the flatbuffers and drop them in `OUT_DIR`. You can then 
 
 ```rust
 #[allow(warnings)]
-pub mod defs {
-    include!(concat!(env!("OUT_DIR"), "/example_generated.rs"));
-}
+mod gen_flatbuffers;
 
-use defs::my_game::sample::Monster;
+use gen_flatbuffers::my_game::sample::Monster;
 
 fn some_fn() {
     // Make use of `Monster`
 }
 ```
+
+Note that this will generate a symlink under `src/gen_flatbuffers`. Remember to add this file
+to your gitignore as this symlink will dynamically change at runtime.
+
+## On file ordering
+
+Unfortunately due to a quirk in the `flatc` compiler the order you provide the `fbs` files does
+matter. From some experimentation, the guidance is to always list files _after_ their
+dependencies. Otherwise, the resulting `mod.rs` will be unusable. As an example, we have a
+`weapon.fbs` and `example.fbs`. Since the latter has an `include` directive for `weapon.fbs`,
+it should go after in the list. If you were to put `example.fbs` _before_ `weapon.fbs`, you'd
+end up only being able to import the contents of `weapon.fbs` and with compilation errors if
+you tried to use any other components.

@@ -6,6 +6,8 @@
 //! check what version that is against whatever version is installed on your system.That said, due
 //! to flatbuffers' versioning policy, it could be ok to mix patch and even minor versions.
 //!
+//! ## Usage
+//!
 //! If you're not sure where to start, take a look at [`BuilderOptions`]. Please also look at the
 //! [`flatbuffers-example`](https://github.com/rdelfin/flatbuffers-build/tree/main/flatbuffers-example)
 //! folder in the repo for an example. However, we'll explain the full functionality here.
@@ -35,7 +37,7 @@
 //! ```no_run
 //! use flatbuffers_build::BuilderOptions;
 //!
-//! BuilderOptions::new_with_files(["example.fbs"])
+//! BuilderOptions::new_with_files(["weapon.fbs", "example.fbs"])
 //!     .compile()
 //!     .expect("flatbuffer compilation failed");
 //! ```
@@ -59,6 +61,19 @@
 //!     // Make use of `Monster`
 //! }
 //! ```
+//!
+//! Note that this will generate a symlink under `src/gen_flatbuffers`. Remember to add this file
+//! to your gitignore as this symlink will dynamically change at runtime.
+//!
+//! ## On file ordering
+//!
+//! Unfortunately due to a quirk in the `flatc` compiler the order you provide the `fbs` files does
+//! matter. From some experimentation, the guidance is to always list files _after_ their
+//! dependencies. Otherwise, the resulting `mod.rs` will be unusable. As an example, we have a
+//! `weapon.fbs` and `example.fbs`. Since the latter has an `include` directive for `weapon.fbs`,
+//! it should go after in the list. If you were to put `example.fbs` _before_ `weapon.fbs`, you'd
+//! end up only being able to import the contents of `weapon.fbs` and with compilation errors if
+//! you tried to use any other components.
 
 use std::{
     ffi::{OsStr, OsString},
@@ -143,7 +158,16 @@ pub struct BuilderOptions {
 
 impl BuilderOptions {
     /// Create a new builder for the compiler options. We purely initialise with an iterable of
-    /// files to compile. To actually build, refer to the [`Self::compile`] function.
+    /// files to compile. To actually build, refer to the [`Self::compile`] function. Note that the
+    /// order of the files is actually important, as incorrect ordering will result in incorrect
+    /// generated code with missing components. You should always put dependencies of other files
+    /// earlier in the list. In other words, if `schema_a.fbs` imports `schema_b.fbs`, then you'd
+    /// want to call this with:
+    ///
+    /// ```rust
+    /// # use flatbuffers_build::BuilderOptions;
+    /// BuilderOptions::new_with_files(["schema_b.fbs", "schema_a.fbs"]);
+    /// ```
     ///
     /// # Arguments
     /// * `files` - An iterable of files that should be compiled into rust code. No glob resolution

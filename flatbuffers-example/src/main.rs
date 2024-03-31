@@ -1,7 +1,7 @@
 #[allow(warnings)]
-mod generated;
+mod gen_flatbuffers;
 
-use generated::my_game::sample::{Monster, MonsterArgs, Vec3};
+use gen_flatbuffers::my_game::sample::{Monster, MonsterArgs, Vec3};
 
 fn main() -> anyhow::Result<()> {
     // Writing a monster object to encoded bytes
