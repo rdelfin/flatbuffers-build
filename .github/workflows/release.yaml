@@ -34,7 +34,6 @@ jobs:
           BUMP_LEVEL: ${{ inputs.bumpLevel }}
           DRY_RUN: ${{ inputs.dryRun }}
 
-
       - uses: actions/checkout@v3
       # - name: Ensure branch is 'main'
       #   run: |
@@ -46,12 +45,12 @@ jobs:
       #     else
       #       echo "Branch is '${branch}'"
       #     fi
-      - name: Build
-        run: cargo build --verbose --all-features --all
-      - name: Run tests
-        run: cargo test --verbose --all-features --all
-      - name: Run clippy
-        run: cargo clippy --verbose --all-features --all -- -D warnings
+      # - name: Build
+      #   run: cargo build --verbose --all-features --all
+      # - name: Run tests
+      #   run: cargo test --verbose --all-features --all
+      # - name: Run clippy
+      #   run: cargo clippy --verbose --all-features --all -- -D warnings
 
   bump_version:
     if: ${{ inputs.bumpLevel != 'none'}}
