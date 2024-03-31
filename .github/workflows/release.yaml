@@ -143,8 +143,7 @@ jobs:
           args: --package flatbuffers-build
           ignore-unpublished-crates: true
           dry-run: ${{ inputs.dryRun }}
-          check-repo: ${{ inputs.dryRun }}
-          no-verify: ${{ inputs.dryRun }}
+          check-repo: false
 
   github_release:
     name: Generate Github release
