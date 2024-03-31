@@ -141,6 +141,7 @@ jobs:
         with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           dry-run: ${{ inputs.dryRun }}
+          ignore-unpublished-changes: true
 
   github_release:
     name: Generate Github release
