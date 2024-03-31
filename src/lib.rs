@@ -1,4 +1,4 @@
-#![warn(clippy::all, clippy::pedantic)]
+#![warn(clippy::all, clippy::pedantic, clippy::cargo)]
 
 //! This crate provides a set of functions to facilitate compiling flatbuffers to Rust from within
 //! Rust. This is particularly helpful for use in `build.rs` scripts. Please note that for

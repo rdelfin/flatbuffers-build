@@ -4,9 +4,11 @@ version = "0.1.0+flatc-23.5.26"
 edition = "2021"
 license = "MIT"
 categories = ["encoding"]
+keywords = ["flatbuffers", "encoding", "codegen"]
 description = "A library that facilitates generating flatbuffer code from Rust"
 authors = ["Ricardo Delfin"]
 readme = "README.md"
+repository = "https://github.com/rdelfin/flatbuffers-build"
 
 [dependencies]
 thiserror = "1"
