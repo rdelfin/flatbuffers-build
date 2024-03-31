@@ -15,7 +15,6 @@ on:
         - patch
       dryRun:
         description: 'Dry Run mode'
-        required: true
         type: boolean
 
 env:
