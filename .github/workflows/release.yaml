@@ -129,6 +129,7 @@ jobs:
     name: Publish crates.io
     runs-on: ubuntu-latest
     needs: bump_version
+    if: ${{ inputs.dryRun }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -148,7 +149,7 @@ jobs:
   github_release:
     name: Generate Github release
     runs-on: ubuntu-latest
-    needs: [bump_version, publish_crates]
+    needs: [bump_version]
     steps:
       - uses: actions/checkout@v3
         with:
