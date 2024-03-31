@@ -134,12 +134,12 @@ jobs:
         with:
           ref: ${{ needs.bump_version.outputs.commit }}
       - name: Show info of checkout
-          run: |
-            echo "Info on commit:"
-            git rev-parse HEAD
-            echo ""
-            VERSION=$(tq -f Cargo.toml .package.version | sed 's/^.\(.*\).$/\1/')
-            echo "Current version: ${VERISON}"
+        run: |
+          echo "Info on commit:"
+          git rev-parse HEAD
+          echo ""
+          VERSION=$(tq -f Cargo.toml .package.version | sed 's/^.\(.*\).$/\1/')
+          echo "Current version: ${VERISON}"
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
