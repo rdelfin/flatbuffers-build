@@ -15,4 +15,4 @@ anyhow = "1"
 flatbuffers = "=23.5.26"
 
 [build-dependencies]
-flatbuffers-build = { path = "..", features = ["vendored"] }
+flatbuffers-build = { version = "0.1.1", path = "..", features = ["vendored"] }
