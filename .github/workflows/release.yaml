@@ -45,7 +45,7 @@ jobs:
         run: cargo clippy --verbose --all-features --all -- -D warnings
 
   bump_version:
-    if: ${{ inputs.bumpLevel != "none"}}
+    if: ${{ inputs.bumpLevel != 'none'}}
     name: Bump version
     runs-on: ubuntu-latest
     needs: verify_build
