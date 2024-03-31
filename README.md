@@ -1,5 +1,8 @@
 # flatbuffers-build
 
+![Github Workflow](https://github.com/rdelfin/flatbuffers-build/actions/workflows/ci.yaml/badge.svg)
+[![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/rdelfin/flatbuffers-build/blob/main/LICENSE)
+
 This crate provides a set of functions to facilitate compiling flatbuffers to Rust from within
 Rust. This is particularly helpful for use in `build.rs` scripts. Please note that for
 compatiblity this crate will only support a single version of the `flatc` compiler. Please
