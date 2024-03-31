@@ -140,7 +140,9 @@ jobs:
       - uses: katyo/publish-crates@v2
         with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          ignore-unpublished-changes: true
           dry-run: ${{ inputs.dryRun }}
+          check-repo: false
 
   github_release:
     name: Generate Github release
