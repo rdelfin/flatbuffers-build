@@ -98,12 +98,14 @@ pub enum Error {
     /// Returned if we fail to spawn a process with `flatc`. Usually means the supplied path to
     /// flatc does not exist.
     #[error("flatc failed to spawn: {0}")]
-    FlatcSpawnFailure(#[from] std::io::Error),
+    FlatcSpawnFailure(#[source] std::io::Error),
     /// Returned if you failed to set either the output path or the `OUT_DIR` environment variable.
     #[error(
-        "Output directory was not set. Either call .set_output_path() or set the `OUT_DIR` env var"
+        "output directory was not set. Either call .set_output_path() or set the `OUT_DIR` env var"
     )]
     OutputDirNotSet,
+    #[error("failed to create symlink path requested: {0}")]
+    SymlinkCreationFailure(#[source] std::io::Error),
 }
 
 /// Alias for a Result that uses [`Error`] as the default error type.
@@ -135,6 +137,8 @@ pub struct BuilderOptions {
     files: Vec<PathBuf>,
     compiler: Option<String>,
     output_path: Option<PathBuf>,
+    symlink_path: Option<PathBuf>,
+    supress_buildrs_directives: bool,
 }
 
 impl BuilderOptions {
@@ -151,6 +155,8 @@ impl BuilderOptions {
             files: files.into_iter().map(|f| f.as_ref().into()).collect(),
             compiler: None,
             output_path: None,
+            symlink_path: None,
+            supress_buildrs_directives: false,
         }
     }
 
@@ -170,7 +176,7 @@ impl BuilderOptions {
     }
 
     /// Call this to set the output directory of the protobufs. If you don't set this, we will
-    /// default to writing to whatever the `OUT_DIR` environment variable is set to.
+    /// default to writing to `${OUT_DIR}/flatbuffers`.
     ///
     /// # Arguments
     /// * `output_path` - The directory to write the files to.
@@ -182,8 +188,32 @@ impl BuilderOptions {
         }
     }
 
+    /// Set a path to create a symlink that points to the output files. This is commonly used to
+    /// symlink to a folder under `src` so you can normally pull in the generated code as a module.
+    /// We recommend always calling this and setting it to `src/generated` or something similar.
+    ///
+    /// # Arguments
+    /// * `symlink_path` - Path to generate the symlink to.
+    #[must_use]
+    pub fn set_symlink_directory<P: AsRef<Path>>(self, symlink_path: P) -> Self {
+        BuilderOptions {
+            symlink_path: Some(symlink_path.as_ref().into()),
+            ..self
+        }
+    }
+
+    /// Set this if you're not running from a `build.rs` script and don't want us to print the
+    /// build.rs instructions/directives that we would otherwise print in stdout.
+    #[must_use]
+    pub fn supress_buildrs_directives(self) -> Self {
+        BuilderOptions {
+            supress_buildrs_directives: true,
+            ..self
+        }
+    }
+
     /// Call this function to trigger compilation. Will write the compiled protobufs to the
-    /// specified directoyr, or to `OUT_DIR` by default.
+    /// specified directory, or to `${OUT_DIR}/flatbuffers` by default.
     ///
     /// # Errors
     /// Will fail if any error happens during compilation, including:
@@ -210,15 +240,48 @@ fn compile(builder_options: BuilderOptions) -> Result {
         }
     });
     let output_path = builder_options.output_path.map_or_else(
-        || std::env::var_os("OUT_DIR").ok_or(Error::OutputDirNotSet),
+        || {
+            std::env::var_os("OUT_DIR")
+                .ok_or(Error::OutputDirNotSet)
+                .map(|mut s| {
+                    s.push(OsString::from("/flatbuffers"));
+                    s
+                })
+        },
         |p| Ok(p.into_os_string()),
     )?;
 
     confirm_flatc_version(&compiler)?;
 
-    let mut args = vec![OsString::from("--rust"), OsString::from("-o"), output_path];
+    let mut args = vec![
+        OsString::from("--rust"),
+        OsString::from("--rust-module-root-file"),
+        OsString::from("-o"),
+        output_path.clone(),
+    ];
     args.extend(files_str);
     run_flatc(&compiler, &args)?;
+
+    if let Some(symlink_path) = builder_options.symlink_path {
+        generate_symlink(&symlink_path, PathBuf::from(output_path))?;
+        if !builder_options.supress_buildrs_directives {
+            println!("cargo::rerun-if-changed={}", symlink_path.display());
+        }
+    }
+
+    if !builder_options.supress_buildrs_directives {
+        for file in builder_options.files {
+            println!("cargo::rerun-if-changed={}", file.display());
+        }
+    }
+    Ok(())
+}
+
+fn generate_symlink<P: AsRef<Path>, Q: AsRef<Path>>(symlink_path: P, output_path: Q) -> Result {
+    if symlink_path.as_ref().exists() {
+        std::fs::remove_file(&symlink_path).map_err(Error::SymlinkCreationFailure)?;
+    }
+    std::os::unix::fs::symlink(output_path, symlink_path).map_err(Error::SymlinkCreationFailure)?;
     Ok(())
 }
 

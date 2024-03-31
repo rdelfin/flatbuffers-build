@@ -1,17 +1,19 @@
 // Example IDL file
- 
+
+include "weapon.fbs";
+
 namespace MyGame.Sample;
- 
+
 enum Color:byte { Red = 0, Green, Blue = 2 }
- 
+
 union Equipment { Weapon } // Optionally add more tables.
- 
+
 struct Vec3 {
   x:float;
   y:float;
   z:float;
 }
- 
+
 table Monster {
   pos:Vec3; // Struct.
   mana:short = 150;
@@ -24,10 +26,5 @@ table Monster {
   equipped:Equipment; // Union.
   path:[Vec3];        // Vector of structs.
 }
- 
-table Weapon {
-  name:string;
-  damage:short;
-}
- 
+
 root_type Monster;

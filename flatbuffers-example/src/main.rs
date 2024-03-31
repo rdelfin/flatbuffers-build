@@ -1,9 +1,7 @@
 #[allow(warnings)]
-pub mod defs {
-    include!(concat!(env!("OUT_DIR"), "/example_generated.rs"));
-}
+mod generated;
 
-use defs::my_game::sample::{Monster, MonsterArgs, Vec3};
+use generated::my_game::sample::{Monster, MonsterArgs, Vec3};
 
 fn main() -> anyhow::Result<()> {
     // Writing a monster object to encoded bytes
