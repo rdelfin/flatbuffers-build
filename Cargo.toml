@@ -18,7 +18,7 @@ vendored = ["anyhow", "cmake", "flate2", "hex", "reqwest", "ring", "tar", "tempf
 
 [workspace]
 members = [
-    "flatbuffers-example",
+    "flatbuffers-build-example",
 ]
 
 [build-dependencies]
