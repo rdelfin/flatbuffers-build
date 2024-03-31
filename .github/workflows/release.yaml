@@ -111,7 +111,7 @@ jobs:
           git push
 
   publish_crates:
-    if ${{ ! inputs.dryRun }}
+    if: ${{ ! inputs.dryRun }}
     name: Publish crates.io
     runs-on: ubuntu-latest
     needs: bump_version
