@@ -189,7 +189,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "flatbuffers-example"
+name = "flatbuffers-build-example"
 version = "0.1.0"
 dependencies = [
  "anyhow",
