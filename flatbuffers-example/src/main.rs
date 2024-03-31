@@ -1,7 +1,7 @@
 // Example crate
 
 #[allow(warnings)]
-#[rustfmt_skip]
+#[rustfmt::skip]
 mod gen_flatbuffers;
 
 use gen_flatbuffers::my_game::sample::{Monster, MonsterArgs, Vec3};
