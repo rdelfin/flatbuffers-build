@@ -1,5 +1,7 @@
 # flatbuffers-build
 
+[![Crates.io](https://img.shields.io/crates/v/flatbuffers-build.svg)](https://crates.io/crates/flatbuffers-build)
+[![docs.rs](https://img.shields.io/docsrs/flatbuffers-build)](https://docs.rs/flatbuffers-build/latest/flatbuffers_build/)
 ![Github Workflow](https://github.com/rdelfin/flatbuffers-build/actions/workflows/ci.yaml/badge.svg)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/rdelfin/flatbuffers-build/blob/main/LICENSE)
 
