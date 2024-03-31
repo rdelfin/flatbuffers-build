@@ -1,0 +1,14 @@
+# {version}
+
+This crate provides a set of functions to facilitate compiling flatbuffers to Rust from within
+Rust. This is particularly helpful for use in `build.rs` scripts. Please note that for
+compatiblity this crate will only support a single version of the `flatc` compiler. Please
+check what version that is against whatever version is installed on your system.That said, due
+to flatbuffers' versioning policy, it could be ok to mix patch and even minor versions.
+
+Please read our [`README`](https://github.com/rdelfin/flatbuffers-build/blob/main/README.md) or
+our [Rust docs](https://docs.rs/flatbuffers-build/latest/flatbuffers-build/) for more details on
+how to use this crate.
+
+Changelog:
+
