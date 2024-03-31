@@ -16,12 +16,15 @@ As an example, imagine a crate with the following folder structure:
 ```bash
 ├── build.rs
 ├── Cargo.toml
-├── example.fbs
+├── schemas
+│   ├── example.fbs
+│   └── weapon.fbs
 └── src
-    └── lib.rs
+    └── main.rs
 ```
-In order to compile and use the code generated from `example.fbs` code, first you need to add
-`flatbuffers-build` to your build dependencies, as well as a matching version of `flatbuffers`:
+In order to compile and use the code generated from both `example.fbs` and `weapon.fbs`, first
+you need to add `flatbuffers-build` to your build dependencies, as well as a matching version
+of `flatbuffers`:
 ```toml
 # Cargo.toml
 # [...]
@@ -35,20 +38,20 @@ flatbuffers-build = "=0.1.0"
 
 You can then have a very simple `build.rs` as follows:
 ```rust
-use flatbuffers_gen::BuilderOptions;
+use flatbuffers_build::BuilderOptions;
 
-BuilderOptions::new_with_files(["example.fbs"])
+BuilderOptions::new_with_files(["schemas/weapon.fbs", "schemas/example.fbs"])
     .set_symlink_directory("src/gen_flatbuffers")
     .compile()
     .expect("flatbuffer compilation failed");
 ```
 
-Note here that `example.fbs` is the same one provided by `flatbuffers` as an example. The
-namespace is `MyGame.Sample` and it contains multiple tables and structs, including a `Monster`
-table.
+Note here that `weapon.fbs` and `example.fbs` are based on the schemas provided by
+`flatbuffers` as an example. The namespace is `MyGame.Sample` and it contains multiple tables
+and structs, including a `Monster` table.
 
-This will just compile the flatbuffers and drop them in `OUT_DIR`. You can then pull them in in
-`lib.rs` like so:
+This will just compile the flatbuffers and drop them in `${OUT_DIR}/flatbuffers` and will
+create a symlink under `src/gen_flatbuffers`. You can then use them in `lib.rs` like so:
 
 ```rust
 #[allow(warnings)]
@@ -61,8 +64,8 @@ fn some_fn() {
 }
 ```
 
-Note that this will generate a symlink under `src/gen_flatbuffers`. Remember to add this file
-to your gitignore as this symlink will dynamically change at runtime.
+Note that since this will generate a symlink under `src/gen_flatbuffers`, you need to add this
+file to your gitignore as this symlink will dynamically change at runtime.
 
 ## On file ordering
 
