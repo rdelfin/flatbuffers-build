@@ -144,16 +144,11 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - name: "Publish crate"
-        run: |
-          if [ "$DRY_RUN" == "true" ]; then
-            CARGO_REGISTRY_TOKEN=$CARGO_REGISTRY_TOKEN cargo publish --dry-run --package flatbuffers-build
-          else
-            CARGO_REGISTRY_TOKEN=$CARGO_REGISTRY_TOKEN cargo publish --package flatbuffers-build
-          fi
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          DRY_RUN: ${{ inputs.dryRun }}
+      - uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          ignore-unpublished-changes: true
+          dry-run: ${{ inputs.dryRun }}
 
   github_release:
     name: Generate Github release
