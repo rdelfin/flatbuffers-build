@@ -9,7 +9,7 @@
 //! ## Usage
 //!
 //! If you're not sure where to start, take a look at [`BuilderOptions`]. Please also look at the
-//! [`flatbuffers-example`](https://github.com/rdelfin/flatbuffers-build/tree/main/flatbuffers-example)
+//! [`flatbuffers-build-example`](https://github.com/rdelfin/flatbuffers-build/tree/main/flatbuffers-build-example)
 //! folder in the repo for an example. However, we'll explain the full functionality here.
 //!
 //! As an example, imagine a crate with the following folder structure:
