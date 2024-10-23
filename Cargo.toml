@@ -13,6 +13,9 @@ repository = "https://github.com/rdelfin/flatbuffers-build"
 [dependencies]
 thiserror = "1"
 
+[target.'cfg(windows)'.dependencies]
+junction = "1.2.0"
+
 [features]
 vendored = ["anyhow", "cmake", "flate2", "hex", "reqwest", "ring", "tar", "tempfile"]
 
