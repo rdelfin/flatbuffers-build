@@ -249,6 +249,7 @@ impl BuilderOptions {
     /// - Invalid protoc files
     /// - Unsupported flatc version
     /// - flatc exiting with a non-zero error code
+    ///
     /// For more details, see [`Error`].
     pub fn compile(self) -> Result {
         compile(self)
