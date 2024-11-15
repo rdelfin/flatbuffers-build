@@ -179,7 +179,7 @@ dependencies = [
 
 [[package]]
 name = "flatbuffers-build"
-version = "0.2.0+flatc-24.3.25"
+version = "0.2.1+flatc-24.3.25"
 dependencies = [
  "anyhow",
  "cmake",
