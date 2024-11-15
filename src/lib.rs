@@ -311,7 +311,10 @@ fn generate_symlink<P: AsRef<Path>, Q: AsRef<Path>>(symlink_path: P, output_path
     if symlink_path.as_ref().exists() {
         std::fs::remove_file(&symlink_path).map_err(Error::SymlinkCreationFailure)?;
     }
+    #[cfg(unix)]
     std::os::unix::fs::symlink(output_path, symlink_path).map_err(Error::SymlinkCreationFailure)?;
+    #[cfg(windows)]
+    junction::create(output_path, symlink_path).map_err(Error::SymlinkCreationFailure)?;
     Ok(())
 }
 
