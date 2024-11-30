@@ -46,7 +46,6 @@ You can then have a very simple `build.rs` as follows:
 use flatbuffers_build::BuilderOptions;
 
 BuilderOptions::new_with_files(["schemas/weapon.fbs", "schemas/example.fbs"])
-    .set_symlink_directory("src/gen_flatbuffers")
     .compile()
     .expect("flatbuffer compilation failed");
 ```
@@ -55,12 +54,14 @@ Note here that `weapon.fbs` and `example.fbs` are based on the schemas provided 
 `flatbuffers` as an example. The namespace is `MyGame.Sample` and it contains multiple tables
 and structs, including a `Monster` table.
 
-This will just compile the flatbuffers and drop them in `${OUT_DIR}/flatbuffers` and will
-create a symlink under `src/gen_flatbuffers`. You can then use them in `lib.rs` like so:
+This will just compile the flatbuffers and drop them in `${OUT_DIR}/flatbuffers`.
+You can then use them in `lib.rs` like so:
 
 ```rust
 #[allow(warnings)]
-mod gen_flatbuffers;
+mod gen_flatbuffers {
+    include!(concat!(env!("OUT_DIR"), "/flatbuffers/mod.rs"));
+}
 
 use gen_flatbuffers::my_game::sample::Monster;
 
@@ -69,8 +70,6 @@ fn some_fn() {
 }
 ```
 
-Note that since this will generate a symlink under `src/gen_flatbuffers`, you need to add this
-file to your gitignore as this symlink will dynamically change at runtime.
 
 ## On file ordering
 
