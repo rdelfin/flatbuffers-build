@@ -49,7 +49,7 @@
 //! `flatbuffers` as an example. The namespace is `MyGame.Sample` and it contains multiple tables
 //! and structs, including a `Monster` table.
 //!
-//! This will just compile the flatbuffers and drop them in `${OUT_DIR}/flatbuffers` 
+//! This will just compile the flatbuffers and drop them in `${OUT_DIR}/flatbuffers`
 //! You can then use them in `lib.rs` like so:
 //!
 //! ```rust,ignore
@@ -277,7 +277,6 @@ fn compile(builder_options: BuilderOptions) -> Result {
     }
     Ok(())
 }
-
 
 fn confirm_flatc_version(compiler: &str) -> Result {
     // Output shows up in stdout
