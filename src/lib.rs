@@ -41,7 +41,6 @@
 //! use flatbuffers_build::BuilderOptions;
 //!
 //! BuilderOptions::new_with_files(["schemas/weapon.fbs", "schemas/example.fbs"])
-//!     .set_symlink_directory("src/gen_flatbuffers")
 //!     .compile()
 //!     .expect("flatbuffer compilation failed");
 //! ```
@@ -50,12 +49,14 @@
 //! `flatbuffers` as an example. The namespace is `MyGame.Sample` and it contains multiple tables
 //! and structs, including a `Monster` table.
 //!
-//! This will just compile the flatbuffers and drop them in `${OUT_DIR}/flatbuffers` and will
-//! create a symlink under `src/gen_flatbuffers`. You can then use them in `lib.rs` like so:
+//! This will just compile the flatbuffers and drop them in `${OUT_DIR}/flatbuffers`
+//! You can then use them in `lib.rs` like so:
 //!
 //! ```rust,ignore
 //! #[allow(warnings)]
-//! mod gen_flatbuffers;
+//! mod gen_flatbuffers {
+//!     include!(concat!(env!("OUT_DIR"), "/flatbuffers/mod.rs"));
+//! }
 //!
 //! use gen_flatbuffers::my_game::sample::Monster;
 //!
@@ -64,8 +65,6 @@
 //! }
 //! ```
 //!
-//! Note that since this will generate a symlink under `src/gen_flatbuffers`, you need to add this
-//! file to your gitignore as this symlink will dynamically change at runtime.
 //!
 //! ## On file ordering
 //!
@@ -121,11 +120,6 @@ pub enum Error {
         "output directory was not set. Either call .set_output_path() or set the `OUT_DIR` env var"
     )]
     OutputDirNotSet,
-    /// Returned when an issue arrises when creating the symlink. Typically this will be things
-    /// like permissions, a directory existing already at the file location, or other filesystem
-    /// errors.
-    #[error("failed to create symlink path requested: {0}")]
-    SymlinkCreationFailure(#[source] std::io::Error),
 }
 
 /// Alias for a Result that uses [`Error`] as the default error type.
@@ -157,7 +151,6 @@ pub struct BuilderOptions {
     files: Vec<PathBuf>,
     compiler: Option<String>,
     output_path: Option<PathBuf>,
-    symlink_path: Option<PathBuf>,
     supress_buildrs_directives: bool,
 }
 
@@ -184,7 +177,6 @@ impl BuilderOptions {
             files: files.into_iter().map(|f| f.as_ref().into()).collect(),
             compiler: None,
             output_path: None,
-            symlink_path: None,
             supress_buildrs_directives: false,
         }
     }
@@ -213,20 +205,6 @@ impl BuilderOptions {
     pub fn set_output_path<P: AsRef<Path>>(self, output_path: P) -> Self {
         BuilderOptions {
             output_path: Some(output_path.as_ref().into()),
-            ..self
-        }
-    }
-
-    /// Set a path to create a symlink that points to the output files. This is commonly used to
-    /// symlink to a folder under `src` so you can normally pull in the generated code as a module.
-    /// We recommend always calling this and setting it to `src/generated` or something similar.
-    ///
-    /// # Arguments
-    /// * `symlink_path` - Path to generate the symlink to.
-    #[must_use]
-    pub fn set_symlink_directory<P: AsRef<Path>>(self, symlink_path: P) -> Self {
-        BuilderOptions {
-            symlink_path: Some(symlink_path.as_ref().into()),
             ..self
         }
     }
@@ -292,29 +270,11 @@ fn compile(builder_options: BuilderOptions) -> Result {
     args.extend(files_str);
     run_flatc(&compiler, &args)?;
 
-    if let Some(symlink_path) = builder_options.symlink_path {
-        generate_symlink(&symlink_path, PathBuf::from(output_path))?;
-        if !builder_options.supress_buildrs_directives {
-            println!("cargo::rerun-if-changed={}", symlink_path.display());
-        }
-    }
-
     if !builder_options.supress_buildrs_directives {
         for file in builder_options.files {
             println!("cargo::rerun-if-changed={}", file.display());
         }
     }
-    Ok(())
-}
-
-fn generate_symlink<P: AsRef<Path>, Q: AsRef<Path>>(symlink_path: P, output_path: Q) -> Result {
-    if symlink_path.as_ref().exists() {
-        std::fs::remove_file(&symlink_path).map_err(Error::SymlinkCreationFailure)?;
-    }
-    #[cfg(unix)]
-    std::os::unix::fs::symlink(output_path, symlink_path).map_err(Error::SymlinkCreationFailure)?;
-    #[cfg(windows)]
-    junction::create(output_path, symlink_path).map_err(Error::SymlinkCreationFailure)?;
     Ok(())
 }
 
