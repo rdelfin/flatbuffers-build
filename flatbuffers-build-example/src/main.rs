@@ -1,6 +1,7 @@
 // Example crate
 
 #[allow(warnings)]
+#[rustfmt::skip]
 mod gen_flatbuffers {
     // for a cleaner code, you could do this in a separate module
     include!(concat!(env!("OUT_DIR"), "/flatbuffers/mod.rs"));
