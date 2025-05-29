@@ -169,8 +169,8 @@ impl BuilderOptions {
     ///
     /// # Arguments
     /// * `files` - An iterable of files that should be compiled into rust code. No glob resolution
-    ///             happens here, and all paths MUST match to real files, either as absolute paths
-    ///             or relative to the current working directory.
+    ///   happens here, and all paths MUST match to real files, either as absolute paths
+    ///   or relative to the current working directory.
     #[must_use]
     pub fn new_with_files<P: AsRef<Path>, I: IntoIterator<Item = P>>(files: I) -> Self {
         BuilderOptions {
@@ -187,7 +187,7 @@ impl BuilderOptions {
     ///
     /// # Arguments
     /// * `compiler` - Path to the compiler to run. This can also be a name that we should resolve
-    ///                using standard `PATH` resolution.
+    ///   using standard `PATH` resolution.
     #[must_use]
     pub fn set_compiler<S: AsRef<str>>(self, compiler: S) -> Self {
         BuilderOptions {
