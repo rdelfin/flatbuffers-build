@@ -272,7 +272,7 @@ fn compile(builder_options: BuilderOptions) -> Result {
 
     if !builder_options.supress_buildrs_directives {
         for file in builder_options.files {
-            println!("cargo::rerun-if-changed={}", file.display());
+            println!("cargo:rerun-if-changed={}", file.display());
         }
     }
     Ok(())
