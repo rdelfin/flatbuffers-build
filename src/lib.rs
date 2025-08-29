@@ -153,6 +153,7 @@ pub struct BuilderOptions {
     output_path: Option<PathBuf>,
     supress_buildrs_directives: bool,
     gen_object_api: bool,
+    additional_flatc_args: Vec<OsString>,
 }
 
 impl BuilderOptions {
@@ -180,6 +181,7 @@ impl BuilderOptions {
             output_path: None,
             supress_buildrs_directives: false,
             gen_object_api: false,
+            additional_flatc_args: Vec::new(),
         }
     }
 
@@ -232,6 +234,18 @@ impl BuilderOptions {
         }
     }
 
+    /// Use this to add additional arguments to pass to flatc. We will strive to provide explicit
+    /// functions to set these arguments, but this lets you add any missing functionality yourself.
+    /// We guarantee to add these arguments in order, right before the output file and input file
+    /// arguments on the `flatc` invocation, regardless of what other arguments we've passed in.
+    /// It's on users to make sure flags don't conflict with those passed by other functions.
+    #[must_use]
+    pub fn add_flatc_arguments<S: AsRef<str>>(mut self, args: &[S]) -> Self {
+        self.additional_flatc_args
+            .extend(args.iter().map(|s| s.as_ref().into()));
+        self
+    }
+
     /// Call this function to trigger compilation. Will write the compiled protobufs to the
     /// specified directory, or to `${OUT_DIR}/flatbuffers` by default.
     ///
@@ -282,6 +296,8 @@ fn compile(builder_options: BuilderOptions) -> Result {
     if builder_options.gen_object_api {
         args.push(OsString::from("--gen-object-api"));
     }
+
+    args.extend_from_slice(&builder_options.additional_flatc_args[..]);
 
     args.extend(vec![OsString::from("-o"), output_path.clone()]);
     args.extend(files_str);
