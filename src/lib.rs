@@ -152,6 +152,7 @@ pub struct BuilderOptions {
     compiler: Option<String>,
     output_path: Option<PathBuf>,
     supress_buildrs_directives: bool,
+    gen_object_api: bool,
 }
 
 impl BuilderOptions {
@@ -178,6 +179,7 @@ impl BuilderOptions {
             compiler: None,
             output_path: None,
             supress_buildrs_directives: false,
+            gen_object_api: false,
         }
     }
 
@@ -215,6 +217,17 @@ impl BuilderOptions {
     pub fn supress_buildrs_directives(self) -> Self {
         BuilderOptions {
             supress_buildrs_directives: true,
+            ..self
+        }
+    }
+
+    /// Generate an additional object-based API. This API is more convenient for object construction
+    /// and mutation than the base API, at the cost of efficiency (object allocation).
+    /// Recommended only to be used if other options are insufficient.
+    #[must_use]
+    pub fn gen_object_api(self) -> Self {
+        BuilderOptions {
+            gen_object_api: true,
             ..self
         }
     }
@@ -264,9 +277,13 @@ fn compile(builder_options: BuilderOptions) -> Result {
     let mut args = vec![
         OsString::from("--rust"),
         OsString::from("--rust-module-root-file"),
-        OsString::from("-o"),
-        output_path.clone(),
     ];
+
+    if builder_options.gen_object_api {
+        args.push(OsString::from("--gen-object-api"));
+    }
+
+    args.extend(vec![OsString::from("-o"), output_path.clone()]);
     args.extend(files_str);
     run_flatc(&compiler, &args)?;
 
