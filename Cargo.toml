@@ -1,6 +1,6 @@
 [package]
 name = "flatbuffers-build"
-version = "0.2.2+flatc-25.2.10"
+version = "0.2.3+flatc-25.2.10"
 edition = "2021"
 license = "MIT"
 categories = ["encoding"]
