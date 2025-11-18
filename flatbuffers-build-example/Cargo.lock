@@ -168,9 +168,9 @@ dependencies = [
 
 [[package]]
 name = "flatbuffers"
-version = "25.2.10"
+version = "25.9.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1045398c1bfd89168b5fd3f1fc11f6e70b34f6f66300c87d44d3de849463abf1"
+checksum = "09b6620799e7340ebd9968d2e0708eb82cf1971e9a16821e2091b6d6e475eed5"
 dependencies = [
  "bitflags 2.9.1",
  "rustc_version",
@@ -178,7 +178,7 @@ dependencies = [
 
 [[package]]
 name = "flatbuffers-build"
-version = "0.2.2+flatc-25.2.10"
+version = "0.2.4+flatc-25.9.23"
 dependencies = [
  "anyhow",
  "cmake",

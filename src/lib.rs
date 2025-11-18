@@ -29,10 +29,10 @@
 //! # Cargo.toml
 //! # [...]
 //! [dependencies]
-//! flatbuffers = "=25.2.10"
+//! flatbuffers = "=25.9.23"
 //!
 //! [build-dependencies]
-//! flatbuffers-build = "=25.2.10"
+//! flatbuffers-build = "=25.9.23"
 //! # [...]
 //! ```
 //!
@@ -87,7 +87,7 @@ const FLATC_BUILD_PATH: Option<&str> = option_env!("FLATC_PATH");
 
 /// Version of `flatc` supported by this library. Make sure this matches exactly with the `flatc`
 /// binary you're using and the version of the `flatbuffers` rust library.
-pub const SUPPORTED_FLATC_VERSION: &str = "25.2.10";
+pub const SUPPORTED_FLATC_VERSION: &str = "25.9.23";
 
 /// Primary error type returned when you compile your flatbuffer specifications to Rust.
 #[derive(thiserror::Error, Debug)]
