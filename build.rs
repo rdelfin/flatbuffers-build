@@ -18,9 +18,9 @@ mod vendored {
 
     const SOURCE_URL: &str =
         "https://github.com/google/flatbuffers/archive/refs/tags/v{version}.tar.gz";
-    const SUPPORTED_FLATC_VERSION: &str = "25.9.23";
+    const SUPPORTED_FLATC_VERSION: &str = "25.12.19";
     const CHECKSUM_SHA256: &str =
-        "9102253214dea6ae10c2ac966ea1ed2155d22202390b532d1dea64935c518ada";
+        "f81c3162b1046fe8b84b9a0dbdd383e24fdbcf88583b9cb6028f90d04d90696a";
     const EXTRACT_DIRECTORY_PREFIX: &str = "flatbuffers-{version}";
 
     pub fn vendor_flatc() -> anyhow::Result<()> {

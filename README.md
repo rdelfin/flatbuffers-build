@@ -34,7 +34,7 @@ of `flatbuffers`:
 # Cargo.toml
 # [...]
 [dependencies]
-flatbuffers = "=25.9.23"
+flatbuffers = "=25.12.19"
 
 [build-dependencies]
 flatbuffers-build = "=0.1.0"
